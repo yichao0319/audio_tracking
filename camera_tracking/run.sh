@@ -1,0 +1,1 @@
+./camera_tracking -w 8 -h 5 -s 0.05

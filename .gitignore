@@ -1,0 +1,17 @@
+delete
+tmp
+*bak
+*.o
+*.xml
+*.yml
+
+## data directory
+data
+fig
+rx_sound
+tx_sound
+
+## exec
+camera_calibration
+camera_tracking
+
