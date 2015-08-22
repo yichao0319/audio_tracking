@@ -1,0 +1,23 @@
+- preporcess raw accl data to allow matlab to read
+  - preprocess_accl_raw.pl
+
+- Analyze walking acceleration pattern:
+  - plot_walk_file.m
+    i) identify walking patterns, 
+    ii) count step
+    plot time-series of step (i) and (ii)
+
+
+  - analyze_step_length.m
+    i) identify walking patterns, 
+    ii) count step, 
+    iii) analyze the step length.
+    
+
+
+challenges
+1. random direction movement
+    - according to WalkCompass, the gyroscope is not accurate enough
+    - even we use WalkCompass
+      i) tail error -- 5% data have 45 degree error
+      ii) Need to Walk a Few Steps before WalkCompass start to work

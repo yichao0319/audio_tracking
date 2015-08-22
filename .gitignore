@@ -10,6 +10,8 @@ data
 fig
 rx_sound
 tx_sound
+accl_raw
+accl_mat
 
 ## exec
 camera_calibration
