@@ -1,0 +1,69 @@
+Use sound to estimate distance to speaker; 
+use accelerometer to count steps and therefore displacement. 
+By combining distance and displacement, we can infer the speaker location in 2D.
+
+
+#######################################
+## Estimate Distance
+#######################################
+- est_fix_dist_pn.m
+- est_fix_dist_since.m
+  Given sound (PN sequence/sinc pulse) receiving at the same location, infer: 
+  (1) initial tx time, 
+  (2) interval between signals, 
+  (3) distance between speaker and microphone
+
+  => not enough information for (3)
+     d_i = (t_i' - t_b - (i-b)*itvl) * v
+     t_b = t_i - (i-b)*itvl - d_i / v
+
+     d_j = (t_j' - (j-b)*itvl) * v - (t_i' - (i-b)*itvl) * v + d_i
+         = d_j                     - d_i                     + d_i
+
+     d_i: distance of signal i (initial distance)
+     t_i': receiving time of signal i
+     t_b: receiving time of reference signal
+     itvl: interval between signals
+     
+     d_j: distance of signal j (we want to estimate dist of signal j)
+     t_j': receiving time of signal j
+
+    => Error of initial location d_i is constant for further estimation d_j.
+
+- cal_t1_itvl_pn.m
+  Given signal index with known distance to speaker, calculate:
+  (1) the reference signal
+  (2) the tx time of the reference signal
+  (3) the interval of signals
+
+  step 1. For each signal, calculate the number of samples to other signals.
+  step 2. Select the most common number of samples from step 1.
+  step 3. Select the signal with highest confidence as the reference signal.
+          Confidence is defined as number of other signals whose interval the the reference signal is the same as the most common number of samples from step 2.
+  step 4. tx time of the reference signal is calculated by: 
+            t_b = t_i - (i-b)*itvl - d_i / v
+
+
+#######################################
+## Estimate Displacement
+#######################################
+
+
+#######################################
+## Visualization
+#######################################
+- visualize_sound_pn.m
+  given sound receiving PN sequence, plot sound in time domain and cross-correlation.
+
+
+#######################################
+## Others
+#######################################
+- Experiment setup
+
+    |----3.1m----|----2.8m----|
+    |                         |
+    3m           .            |
+    |          spk (1m)       |   
+    |----3.1m----|----2.8m----|
+

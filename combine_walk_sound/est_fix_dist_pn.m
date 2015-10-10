@@ -8,15 +8,44 @@
 %%
 %%
 %% example:
-%%  analyze_pn_corr('./rx_sound/', '08.10.pn.511.8000.1.dist30', 'rx')
-%%  analyze_pn_corr('./rx_sound/', '08.10.pn.4095.8000.1.dist30', 'rx')
-%%  analyze_pn_corr('./rx_sound/', '08.10.pn.511.8000.1.dist50', 'rx')
-%%  analyze_pn_corr('./rx_sound/', '08.10.pn.1023.8000.1.dist50', 'rx')
-%%  analyze_pn_corr('./rx_sound/', '09.03.pn.2047.8000.1.dist0.4', 'rx')
+%%   est_fix_dist_pn('0903.exp4.fix.pn2047.1m', 8000, 2047, 1, 1)
+%%   est_fix_dist_pn('0903.exp5.fix.pn2047.0.5m', 8000, 2047, 0.5, 1)
+%%
+%%   est_fix_dist_pn('0904.exp1.fix.pn2047.loc1', 8000, 2047, sqrt(2.8^2+1^2), 1)
+%%   est_fix_dist_pn('0904.exp1.fix.pn2047.loc2', 8000, 2047, 1, 1)
+%%   est_fix_dist_pn('0904.exp1.fix.pn2047.loc3', 8000, 2047, sqrt(3.1^2+1^2), 1)
+%%   est_fix_dist_pn('0904.exp1.fix.pn2047.loc4', 8000, 2047, sqrt(3.1^2+2^2), 1)
+%%   est_fix_dist_pn('0904.exp1.fix.pn2047.loc5', 8000, 2047, 2, 1)
+%%   est_fix_dist_pn('0904.exp1.fix.pn2047.loc6', 8000, 2047, sqrt(2.8^2+2^2), 1)
+%%
+%%   est_fix_dist_pn('0906.exp4.fix.pn2047.loc1', 8000, 2047, sqrt(2.8^2+1^2), 1)
+%%   est_fix_dist_pn('0906.exp4.fix.pn2047.loc2', 8000, 2047, 1, 1)
+%%   est_fix_dist_pn('0906.exp4.fix.pn2047.loc3', 8000, 2047, sqrt(3.1^2+1^2), 1)
+%%   est_fix_dist_pn('0906.exp4.fix.pn2047.loc4', 8000, 2047, sqrt(3.1^2+2^2), 1)
+%%   est_fix_dist_pn('0906.exp4.fix.pn2047.loc5', 8000, 2047, 2, 1)
+%%   est_fix_dist_pn('0906.exp4.fix.pn2047.loc6', 8000, 2047, sqrt(2.8^2+2^2), 1)
 %%     
+%%   est_fix_dist_pn('0906.exp1.1m.degree0', 8000, 2047, 1, 1)
+%%   est_fix_dist_pn('0906.exp1.1m.degree45', 8000, 2047, 1, 1)
+%%   est_fix_dist_pn('0906.exp1.1m.degree90', 8000, 2047, 1, 1)
+%%   est_fix_dist_pn('0906.exp1.1m.degree135', 8000, 2047, 1, 1)
+%%   est_fix_dist_pn('0906.exp1.1m.degree180', 8000, 2047, 1, 1)
+%%   est_fix_dist_pn('0906.exp1.1m.degree225', 8000, 2047, 1, 1)
+%%   est_fix_dist_pn('0906.exp1.1m.degree270', 8000, 2047, 1, 1)
+%%   est_fix_dist_pn('0906.exp1.1m.degree315', 8000, 2047, 1, 1)
+%%
+%%   est_fix_dist_pn('0906.exp2.3m.wall.degree0', 8000, 2047, 1, 1)
+%%   est_fix_dist_pn('0906.exp2.3m.wall.degree45', 8000, 2047, 1, 1)
+%%   est_fix_dist_pn('0906.exp2.3m.wall.degree90', 8000, 2047, 1, 1)
+%%   est_fix_dist_pn('0906.exp2.3m.wall.degree135', 8000, 2047, 1, 1)
+%%   est_fix_dist_pn('0906.exp2.3m.wall.degree180', 8000, 2047, 1, 1)
+%%   est_fix_dist_pn('0906.exp2.3m.wall.degree225', 8000, 2047, 1, 1)
+%%   est_fix_dist_pn('0906.exp2.3m.wall.degree270', 8000, 2047, 1, 1)
+%%   est_fix_dist_pn('0906.exp2.3m.wall.degree315', 8000, 2047, 1, 1)
+%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-function analyze_pn_corr(input_dir, filename, txrx)
+function [err] = est_fix_dist_pn(filename, freq, pn_len, init_dist, frame_len)
     % addpath('../utils');
     
     %% --------------------
@@ -34,27 +63,33 @@ function analyze_pn_corr(input_dir, filename, txrx)
     %% --------------------
     %% Constant
     %% --------------------
+    input_dir = './sound/';
+    fig_dir = './fig/';
+
     sound_speed = 331;
 
-    freq = 8000;
-    amp = 2;
-    frame_len = 1;
     thresh = 0.8;
+
+    fig_idx = 0;
     font_size = 16;
+
+
 
 
     %% --------------------
     %% Variable
     %% --------------------
-    output_dir = './fig/';
+    
 
 
     %% --------------------
     %% Check input
     %% --------------------
-    if nargin < 1, input_dir = './tx_sound/'; end
-    if nargin < 2, filename = 'pn.8000.1'; end
-    if nargin < 3, txrx = 'tx'; end
+    if nargin < 1, filename = 'pn.8000.1'; end
+    if nargin < 2, freq = 8000; end
+    if nargin < 3, pn_len = 2047; end
+    if nargin < 4, init_dist = 1; end
+    if nargin < 5, frame_len = 1; end
 
 
     %% --------------------
@@ -63,7 +98,7 @@ function analyze_pn_corr(input_dir, filename, txrx)
     %% ====================================
     %% Get sound info
     %% ====================================
-    [pn_len, freq, frame_len, dist] = get_sound_info(filename);
+    % [pn_len, freq, frame_len, dist] = get_sound_info(filename);
 
     
     %% ====================================
@@ -71,11 +106,7 @@ function analyze_pn_corr(input_dir, filename, txrx)
     %% ====================================
     if DEBUG2, fprintf('Read file\n'); end
 
-    if strcmp(txrx, 'tx')
-        ext = 'wav';
-    else
-        ext = 'aac';
-    end
+    ext = 'aac';
     file_path_name = [input_dir filename '.' ext];
     [wav_data, Fs] = audioread(file_path_name);
     Ts = 1/Fs;
@@ -94,11 +125,14 @@ function analyze_pn_corr(input_dir, filename, txrx)
         fprintf('  duration = %f\n', wav_time(end));
     end
     
-    if strcmp(txrx, 'tx')
-        wav_data = wav_data(:,2);
-    else
-        wav_data = wav_data(:,1);
-    end
+    wav_data = wav_data(:,1);
+
+    % fig_idx = fig_idx + 1;
+    % fh = figure(fig_idx); clf;
+    % plot(wav_time, wav_data);
+    % waitforbuttonpress
+    % print(fh, '-dpsc', [fig_dir filename '.sound.eps']);
+
 
 
     %% ====================================
@@ -145,7 +179,7 @@ function analyze_pn_corr(input_dir, filename, txrx)
     % set(gca, 'XLim', [0 10]);
     
 
-    [v, idx] = max(maxpeak(1:5*frame_len*Fs));
+    [v, idx] = max(maxpeak(1:1*frame_len*Fs));
 
     % fh = figure(1); clf;
     % plot(wav_time, maxpeak);
@@ -172,101 +206,21 @@ function analyze_pn_corr(input_dir, filename, txrx)
         end
     end
 
+
+    %% ====================================
+    %% Calculate base, interval, and t1
+    %% ====================================
     peaks_idx(2:end) - peaks_idx(1:end-1)
-
-    % plot(wav_time, maxpeak);
-    % hold on;
-    % plot(wav_time(peaks_idx), maxpeak(peaks_idx), 'ro');
-    % set(gca, 'XLim', [0 30]);
-
-
-    %% ====================================
-    %% learn interval length
-    %% ====================================
-    num_train = 10;
-    train_itvls = (peaks_idx(2:num_train) - peaks_idx(1)) ./ [1:num_train-1] / Fs;
-    rcv_itvl = median(train_itvls);
-    % std(train_itvls)
-    % mean(train_itvls)
-    % rcv_itvl
-
-
-    %% ====================================
-    %% learn initial time
-    %% ====================================
-    num_train = 10;
-    init_dist = dist;
-    init_times = peaks_idx(1:num_train) / Fs - [0:num_train-1] * rcv_itvl - dist/sound_speed;
-    init_time = median(init_times);
-    % std(init_times)
-    % mean(init_times)
-    % init_time
-
-
-    %% ====================================
-    %% calculate distance
-    %% ====================================
-    dists = (peaks_idx / Fs - init_time - [0:length(peaks_idx)-1]*rcv_itvl) * sound_speed;
-    dist_err = abs(dists - dist);
-    mean(dist_err) * 100
+    [base, t1, itvl] = cal_t1_itvl(peaks_idx, init_dist, Fs, frame_len);
     
-    time_len = 25;
-    fh = figure; clf;
-    subplot(3, 1, 1)
-    lh = plot([0:length(dists)-1]*rcv_itvl, dists);
-    set(lh, 'LineWidth', 4);
-    set(gca, 'XLim', [0 time_len]);
-    % set(gca, 'YLim', [min(dists)-5 max(dists)+5]);
-    xlabel('Time (s)', 'FontSize', font_size);
-    ylabel('Distance (m)', 'FontSize', font_size);
-    set(gca, 'FontSize', font_size);
 
-    subplot(3, 1, 2)
-    lh = plot([0:length(dists)-1]*rcv_itvl, dist_err);
-    set(lh, 'LineWidth', 4);
-    set(gca, 'XLim', [0 time_len]);
-    xlabel('Time (s)', 'FontSize', font_size);
-    ylabel('Distance (m)', 'FontSize', font_size);
-    set(gca, 'FontSize', font_size);
-
-    subplot(3, 1, 3)
-    lh = plot(wav_time, maxpeak);
-    set(lh, 'LineWidth', 4);
-    hold on;
-    plot(wav_time(peaks_idx), maxpeak(peaks_idx), 'ro');
-    set(gca, 'XLim', [0 time_len]);
-    xlabel('Time (s)', 'FontSize', font_size);
-    ylabel('xcorr', 'FontSize', font_size);
-    set(gca, 'FontSize', font_size);
-
-    print(fh, '-dpng', [output_dir filename '.png']);
-    
-    
-    
-    % mean(dist_err) * 100
-    % [p, v] = ecdf(dist_err);
-
-    % fh = figure; clf;
-    % plot(v, p)
+    %% ====================================
+    %% Calculate distance
+    %% d_i = (t_i' - t_b - (i-b)*itvl) * v
+    %% ====================================
+    dists = (peaks_idx/Fs - t1 - ([1:length(peaks_idx)]-base)*itvl) * sound_speed
+    median(dists)
+    mean(dists)
+    err = abs(dists - init_dist)
 end
 
-
-%% 08.10.pn.511.8000.1.dist30
-function [pn_len, freq, frame_len, dist] = get_sound_info(filename)
-    expression = ['.*\.pn\.(?<pn_len>\d+)\.(?<freq>\d+)\.(?<frame_len>\d+)\.dist(?<dist>\d+\.*\d*)'];
-    tokenNames = regexp(filename, expression, 'names');
-    if(length(tokenNames) > 0)
-        % freq = str2num(tokenNames(1).freq) * 1000;
-        pn_len = str2num(tokenNames(1).pn_len);
-        freq = str2num(tokenNames(1).freq);
-        dist = str2num(tokenNames(1).dist);
-        frame_len = str2num(tokenNames(1).frame_len);
-        
-        fprintf('  pn len = %f\n', pn_len);
-        fprintf('  freq = %d\n', freq);
-        fprintf('  dist = %f\n', dist);
-        fprintf('  frame_len = %f\n', frame_len);
-    else
-        error(['wong format: ' filename]);
-    end
-end

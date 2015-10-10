@@ -2,7 +2,7 @@
 function gen_pn_tone()
     
     output_dir = './tx_sound/';
-    freq = 16000;
+    freq = 6000;
     total_len = 600;
     frame_len = 1;
     amp = 2;

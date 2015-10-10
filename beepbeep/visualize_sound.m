@@ -56,8 +56,24 @@ function visualize_sound(filename)
     %% --------------------
     if DEBUG2, fprintf('Read Audio\n'); end
 
-    % [data, Fs] = audioread([input_dir filename '.wav']);
-    [data, Fs] = audioread([input_dir filename '.m4a']);
+    find_file = 0;
+    while(find_file < 2)
+        if find_file == 0
+            full_filename = [input_dir filename '.wav'];
+        elseif find_file == 1
+            full_filename = [input_dir filename '.aac'];
+        end
+        find_file = find_file + 1;
+        
+        if exist(full_filename, 'file') == 2
+            break;
+        end
+    end
+    if find_file > 2
+        error(['  cannot find file: ' full_filename]);
+    end
+    
+    [data, Fs] = audioread(full_filename);
     Ts = 1/Fs;
     nbits = 16;
     fprintf('  file = %s\n', [input_dir filename '.wav']);
@@ -89,7 +105,8 @@ function visualize_sound(filename)
     %% --------------------
     if DEBUG2, fprintf('Short-time Fourier transform\n'); end
 
-    window = floor(Fs/2);
+    % window = floor(Fs/2);
+    window = floor(Fs/10);
     noverlap = floor(window/4); % 75% overlap
     Nfft = Fs;
     

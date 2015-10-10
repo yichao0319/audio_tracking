@@ -51,7 +51,7 @@ function plot_walk_file()
     %% Variable
     %% --------------------
     input_dir  = './accl_mat/';
-    output_dir = './fig/';
+    fig_dir = './fig/';
     filename = '0820.exp1.accl.walk.50m';
     % filename = '0820.exp2.accl.walk.55m';
     % filename = '0820.exp3.accl.walk.45m';
@@ -153,7 +153,7 @@ function plot_walk_file()
         % ylim([f_min f_max]);
         xlabel('Time (s)');
         ylabel('Power/Frequency (dB/Hz)');
-        print(fh, '-dpsc', [output_dir filename '.psd.eps']);
+        print(fh, '-dpsc', [fig_dir filename '.psd.eps']);
     end
 
 
@@ -179,7 +179,7 @@ function plot_walk_file()
     % hold on;
     % plot(step_idx, autocorr(step_idx), 'g.');
     set(gca, 'XLim', [1 ts_len]);
-
+    print(fh, '-dpsc', [fig_dir filename '.xcorr.eps']);
 
 end
 

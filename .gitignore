@@ -12,6 +12,11 @@ rx_sound
 tx_sound
 accl_raw
 accl_mat
+raw
+accel
+sound
+mat
+raw_combine_walk_sound
 
 ## exec
 camera_calibration

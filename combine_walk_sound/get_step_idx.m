@@ -23,12 +23,12 @@ function [step_idx, periodic_idx, autocorr, fig_idx] = get_step_idx(ts, win_rang
     DEBUG3 = 1;  %% verbose
     DEBUG4 = 1;  %% results
 
-    
+
     %% --------------------
     %% Constant
     %% --------------------
 
-    
+
     %% --------------------
     %% Variable
     %% --------------------
@@ -40,6 +40,8 @@ function [step_idx, periodic_idx, autocorr, fig_idx] = get_step_idx(ts, win_rang
     if nargin < 2, win_ranges = [15:30]; end
     if nargin < 3, fig_idx = 0; end
     if length(win_ranges) < 2, win_ranges = [15:30]; end
+
+    win_ranges
 
 
     %% --------------------
@@ -53,10 +55,12 @@ function [step_idx, periodic_idx, autocorr, fig_idx] = get_step_idx(ts, win_rang
 
     ts_len = length(ts);
     ts_r = [];
+    ts_d = [];
     ts_win = [];
     ti = 1;
     while(ti <= ts_len)
         r = [];
+        d = [];
         for wi = 1:length(win_ranges)
             win = win_ranges(wi);
             if ti+2*win-1 > ts_len
@@ -67,50 +71,69 @@ function [step_idx, periodic_idx, autocorr, fig_idx] = get_step_idx(ts, win_rang
             if numel(corr) > 1
                 r(wi) = corr(1,2);
             end
+
+            d(wi) = std(ts(ti:ti+win-1));
         end
 
         %% find the best period length
         [max_r,idx] = max(r);
         max_win = win_ranges(idx);
         ts_r(ti:ti+max_win-1) = max_r;
+        ts_d(ti:ti+max_win-1) = d(idx);
         ts_win(ti:ti+max_win-1) = max_win;
     
         %% update per iteration    
         win_ranges = [max(1,max_win-5):max(15,max_win+5)];
         ti = ti + max_win;
     end
-    
+
     % thresh = (mean(ts_r(1:10)) + max(ts_r)) * 1 / 2;
     thresh = 0.8;
+    thresh_d = 0.05;
     fprintf('  thresh=%f, min=%d, max=%d\n', thresh, min(ts_r), max(ts_r));
 
     %% thresholding to find periodic portions
-    [v,std_idx] = find(ts_r > thresh);
+    std_idx = find(ts_r > thresh);
+    trial = 100;
+    while(length(std_idx) < 1)
+        thresh = thresh / 2;
+        std_idx = find(ts_r > thresh);
+        trial = trial - 1;
+        if(trial <= 0)
+            fprintf(' check thres\n');
+            return
+        end
+    end
     std_idx = std_idx(1);
     tmp_ts_r = ts_r(std_idx:end);
-    [v,end_idx] = find(tmp_ts_r <= thresh);
+    end_idx = find(tmp_ts_r <= thresh);
     end_idx = end_idx(1) - 1;
     end_idx = end_idx + std_idx - 1;
+
+    %% find those std > thresh_d
+    idx = find(ts_d <= thresh_d);
+    ts_r(idx) = 0;
 
     % std_idx = 100;
     % end_idx = 700;
     periodic_idx = [std_idx, end_idx];
     autocorr = ts_r;
 
-    
+
     %% plot ts and corrcoef
-    % fig_idx = fig_idx + 1;
-    % fh = figure(fig_idx); clf;
-    % subplot(2,1,1);
-    % plot(ts);
-    % hold on;
-    % plot([std_idx, end_idx], ts([std_idx, end_idx]), 'ro');
-    % set(gca, 'XLim', [1 ts_len]);
-    % subplot(2,1,2);
-    % plot(ts_r);
-    % hold on;
-    % plot([std_idx, end_idx], ts_r([std_idx, end_idx]), 'ro');
-    % set(gca, 'XLim', [1 ts_len]);
+    fig_idx = fig_idx + 1;
+    fh = figure(fig_idx); clf;
+    subplot(2,1,1);
+    plot(ts, '-b.');
+    hold on;
+    plot([std_idx, end_idx], ts([std_idx, end_idx]), 'ro');
+    set(gca, 'XLim', [1 ts_len]);
+    subplot(2,1,2);
+    plot(ts_r);
+    hold on;
+    plot([std_idx, end_idx], ts_r([std_idx, end_idx]), 'ro');
+    plot(ts_d, '-r');
+    set(gca, 'XLim', [1 ts_len]);
 
 
     %% --------------------
@@ -125,21 +148,21 @@ function [step_idx, periodic_idx, autocorr, fig_idx] = get_step_idx(ts, win_rang
 
     step_idx = [];
     ti = std_idx;
-    while(ti <= end_idx - ts_win(end));
-        win = ts_win(ti);
-        % imin
-        % fprintf('  range = %d-%d\n', ti, ti+win);
-        ii = find(imin > ti & imin < ti + 1.5*win);
-        % ii
-        % ts(imin(ii))
-        [v,idx] = min(ts(imin(ii)));
+    % while(ti <= end_idx - ts_win(end));
+    %     win = ts_win(ti);
+    %     % imin
+    %     % fprintf('  range = %d-%d\n', ti, ti+win);
+    %     ii = find(imin > ti & imin < ti + 1.5*win);
+    %     % ii
+    %     % ts(imin(ii))
+    %     [v,idx] = min(ts(imin(ii)));
 
-        step_idx = [step_idx, imin(ii(idx))];
+    %     step_idx = [step_idx, imin(ii(idx))];
 
-        % fprintf('  > ti=%d: step=%d\n', ti, step_idx(end));
-        ti = step_idx(end) + 1;
-        % input('')
-    end
+    %     % fprintf('  > ti=%d: step=%d\n', ti, step_idx(end));
+    %     ti = step_idx(end) + 1;
+    %     % input('')
+    % end
 
 end
 

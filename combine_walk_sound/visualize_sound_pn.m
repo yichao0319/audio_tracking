@@ -8,15 +8,21 @@
 %%
 %%
 %% example:
-%%  analyze_pn_corr('./rx_sound/', '08.10.pn.511.8000.1.dist30', 'rx')
-%%  analyze_pn_corr('./rx_sound/', '08.10.pn.4095.8000.1.dist30', 'rx')
-%%  analyze_pn_corr('./rx_sound/', '08.10.pn.511.8000.1.dist50', 'rx')
-%%  analyze_pn_corr('./rx_sound/', '08.10.pn.1023.8000.1.dist50', 'rx')
-%%  analyze_pn_corr('./rx_sound/', '09.03.pn.2047.8000.1.dist0.4', 'rx')
+%%   visualize_sound_pn('0903.exp1.walk.square', 8000, 2047, 2.7)
+%%   visualize_sound_pn('0903.exp4.fix.pn2047.1m', 8000, 2047, 1)
+%%
+%%   visualize_sound_pn('0906.exp4.fix.pn2047.loc1', 8000, 2047, sqrt(2.8^2+1^2))
+%%   visualize_sound_pn('0906.exp4.fix.pn2047.loc2', 8000, 2047, 1)
+%%   visualize_sound_pn('0906.exp4.fix.pn2047.loc3', 8000, 2047, sqrt(3.1^2+1^2))
+%%   visualize_sound_pn('0906.exp4.fix.pn2047.loc4', 8000, 2047, sqrt(3.1^2+2^2))
+%%   visualize_sound_pn('0906.exp4.fix.pn2047.loc5', 8000, 2047, 2)
+%%   visualize_sound_pn('0906.exp4.fix.pn2047.loc6', 8000, 2047, sqrt(2.8^2+2^2))
+%%
+%%   visualize_sound_pn('0906.exp2.3m.wall.degree0', 8000, 2047, 1)
 %%     
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-function analyze_pn_corr(input_dir, filename, txrx)
+function visualize_sound_pn(filename, freq, pn_len, init_dist)
     % addpath('../utils');
     
     %% --------------------
@@ -34,27 +40,33 @@ function analyze_pn_corr(input_dir, filename, txrx)
     %% --------------------
     %% Constant
     %% --------------------
+    input_dir = './sound/'
+    fig_dir = './fig/';
+
     sound_speed = 331;
 
-    freq = 8000;
-    amp = 2;
     frame_len = 1;
     thresh = 0.8;
+
+    fig_idx = 0;
     font_size = 16;
+
+
 
 
     %% --------------------
     %% Variable
     %% --------------------
-    output_dir = './fig/';
+    
 
 
     %% --------------------
     %% Check input
     %% --------------------
-    if nargin < 1, input_dir = './tx_sound/'; end
-    if nargin < 2, filename = 'pn.8000.1'; end
-    if nargin < 3, txrx = 'tx'; end
+    if nargin < 1, filename = 'pn.8000.1'; end
+    if nargin < 2, freq = 8000; end
+    if nargin < 3, pn_len = 2047; end
+    if nargin < 4, init_dist = 2.7; end
 
 
     %% --------------------
@@ -63,7 +75,7 @@ function analyze_pn_corr(input_dir, filename, txrx)
     %% ====================================
     %% Get sound info
     %% ====================================
-    [pn_len, freq, frame_len, dist] = get_sound_info(filename);
+    % [pn_len, freq, frame_len, dist] = get_sound_info(filename);
 
     
     %% ====================================
@@ -71,11 +83,7 @@ function analyze_pn_corr(input_dir, filename, txrx)
     %% ====================================
     if DEBUG2, fprintf('Read file\n'); end
 
-    if strcmp(txrx, 'tx')
-        ext = 'wav';
-    else
-        ext = 'aac';
-    end
+    ext = 'aac';
     file_path_name = [input_dir filename '.' ext];
     [wav_data, Fs] = audioread(file_path_name);
     Ts = 1/Fs;
@@ -94,11 +102,13 @@ function analyze_pn_corr(input_dir, filename, txrx)
         fprintf('  duration = %f\n', wav_time(end));
     end
     
-    if strcmp(txrx, 'tx')
-        wav_data = wav_data(:,2);
-    else
-        wav_data = wav_data(:,1);
-    end
+    wav_data = wav_data(:,1);
+
+    fig_idx = fig_idx + 1;
+    fh = figure(fig_idx); clf;
+    plot(wav_time, wav_data);
+    % print(fh, '-dpsc', [fig_dir filename '.sound.eps']);
+
 
 
     %% ====================================
@@ -145,7 +155,7 @@ function analyze_pn_corr(input_dir, filename, txrx)
     % set(gca, 'XLim', [0 10]);
     
 
-    [v, idx] = max(maxpeak(1:5*frame_len*Fs));
+    [v, idx] = max(maxpeak(1:1*frame_len*Fs));
 
     % fh = figure(1); clf;
     % plot(wav_time, maxpeak);
@@ -195,7 +205,7 @@ function analyze_pn_corr(input_dir, filename, txrx)
     %% learn initial time
     %% ====================================
     num_train = 10;
-    init_dist = dist;
+    dist = init_dist;
     init_times = peaks_idx(1:num_train) / Fs - [0:num_train-1] * rcv_itvl - dist/sound_speed;
     init_time = median(init_times);
     % std(init_times)
@@ -210,8 +220,10 @@ function analyze_pn_corr(input_dir, filename, txrx)
     dist_err = abs(dists - dist);
     mean(dist_err) * 100
     
-    time_len = 25;
-    fh = figure; clf;
+    time_len = wav_time(end);
+    fig_idx = fig_idx + 1;
+    fh = figure(fig_idx); clf;
+    
     subplot(3, 1, 1)
     lh = plot([0:length(dists)-1]*rcv_itvl, dists);
     set(lh, 'LineWidth', 4);
@@ -239,7 +251,7 @@ function analyze_pn_corr(input_dir, filename, txrx)
     ylabel('xcorr', 'FontSize', font_size);
     set(gca, 'FontSize', font_size);
 
-    print(fh, '-dpng', [output_dir filename '.png']);
+    print(fh, '-dpsc', [fig_dir filename '.sound_dist.eps']);
     
     
     
