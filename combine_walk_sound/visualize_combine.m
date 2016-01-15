@@ -37,27 +37,39 @@ function visualize_combine()
     %% --------------------
     %% Variable
     %% --------------------
-    filename = '0904.acc';
+    
     fig_idx = 0;
 
-    dists = [sqrt(2.8^2+1^2), 1, sqrt(3.1^2+1^2), sqrt(3.1^2+2^2), 2, sqrt(2.8^2+2^2), sqrt(2.8^2+1^2)] * 1.02;
-    % displacements = [2.8, 3.1, 3, 3.1, 2.8, 3] * 1.02;
-    % directions = [0,1,0; 0,1,0; 1,0,0; 0,-1,0; 0,-1,0; -1,0,0];
+    %% exp
+    % filename = '0904.acc';
+    % dists = [sqrt(2.8^2+1^2), 1, sqrt(3.1^2+1^2), sqrt(3.1^2+2^2), 2, sqrt(2.8^2+2^2), sqrt(2.8^2+1^2)] * 1.02;
+    % displacements = [5, 6, 5, 5, 5, 6] * 0.7;
+    % directions = [0.7739, -0.6298, 0.0662; 0.7701, -0.6304, 0.0974; 0.6124, 0.7828, 0.1103; -0.7809, 0.6166, -0.0995; -0.7889, 0.6060, -0.1022; -0.5324, -0.8447, -0.0544];
 
-    %% pn, mean
-    % dists = [3.0775, 1.0023, 3.2573, 3.6892, 2.0023, 2.3526, 3.0775];
-    %% pn, median
-    % dists = [1.5291, 1.0016, 3.0369, 3.5316, 1.9073, 2.5240, 1.5291];
-    %% sinc, mean
-    % dists = [2.9736, 1.7843, 3.4112, 10.8496, 2.0038, 3.4409, 2.9736];
-    %% sinc, median
-    % dists = [2.9735, 1.7343, -5.4669, 9.4542, 2.0038, 3.4428, 2.9735];
-    displacements = [5, 6, 5, 5, 5, 6] * 0.7;
-    directions = [0.7739, -0.6298, 0.0662; 0.7701, -0.6304, 0.0974; 0.6124, 0.7828, 0.1103; -0.7809, 0.6166, -0.0995; -0.7889, 0.6060, -0.1022; -0.5324, -0.8447, -0.0544];
+    %% 1023.exp8
+    % filename = '1023.exp8';
+    % dists = sqrt(sum(([0,0; 10,0; 20,0; 20,10; 20,20; 10,20; 0,20; 0,10; 0,0] - repmat([10,10],9,1)).^2,2)) .* (rand(9,1)/10+1);
+    % displacements = ones(1,8)*13 * 0.7; 
+    % displacements([2,5]) = 12; displacements([3]) = 13.2;
+    % directions = [1.00,0.00;1.00,-0.01;0.08,-1.00;0.09,-1.00;-1.00,-0.09;-1.00,-0.09;-0.15,0.99;-0.16,0.99];
+    %% 1023.exp9
+    % filename = '1023.exp9';
+    % dists = sqrt(sum(([0,0; 10,0; 20,0; 30,0; 30,10; 30,20; 20,20; 10,20; 0,20; 0,10; 0,0] - repmat([10,10],11,1)).^2,2)) .* (rand(11,1)/1+1);
+    % displacements = ones(1,10)*13 * 0.7; 
+    % displacements([2,5]) = 12; displacements([3]) = 13.2;
+    % directions = [1.00,0.00;1.00,-0.05;1.00,-0.07;-0.10,-0.99;-0.19,-0.98;-0.90,-0.44;-0.87,-0.49;-0.86,-0.50;0.55,0.83;0.59,0.81;];
+    filename = '1023.exp9';
+    dists = sqrt(sum(([0,0; 10,0; 20,0; 30,0; 30,10; 30,20; 20,20; 10,20; 0,20; 0,10; 0,0] - repmat([10,10],11,1)).^2,2)) .* (rand(11,1)/0.8+1);
+    displacements = ones(1,10)*13 * 0.7; 
+    displacements([2,5]) = 12 * 0.7; displacements([3]) = 13.2 * 0.7;
+    directions = [1.00,0.00;1.00,-0.05;1.00,-0.07;-0.10,-0.99;-0,-0.98;-0.90,-0;-0.87,-0;-0.86,-0.10;0,0.93;0.1,0.91;];
+
+
 
     loc{1} = [0,0];
 
-    gran = 0.01;
+    % gran = 0.01;
+    gran = 0.5;
     
     
     %% --------------------
@@ -85,8 +97,9 @@ function visualize_combine()
         yp=dists(si)*sin(ang);
         plot(loc{si}(1)+xp,loc{si}(2)+yp);
         if si > 1, arrow(loc{si-1}, loc{si}); end
-        print(fh, '-dpsc', [fig_dir filename '.' num2str(si) '.line.eps']);
-
+        % print(fh, '-dpsc', [fig_dir filename '.' num2str(si) '.line.eps']);
+        print(fh, '-dpng', [fig_dir filename '.' num2str(si) '.line.png']);
+        
 
         %% recalculate probability
         xlim = get(gca,'xlim');
@@ -128,7 +141,8 @@ function visualize_combine()
             hold on;
             if sj > 1, arrow(loc{sj-1}, loc{sj}); end
         end
-        print(fh, '-dpsc', [fig_dir filename '.' num2str(si) '.map.eps']);
+        % print(fh, '-dpsc', [fig_dir filename '.' num2str(si) '.map.eps']);
+        print(fh, '-dpng', [fig_dir filename '.' num2str(si) '.map.png']);
 
         % waitforbuttonpress
     end

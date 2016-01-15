@@ -41,7 +41,7 @@ function [step_idx, periodic_idx, autocorr, fig_idx] = get_step_idx(ts, win_rang
     if nargin < 3, fig_idx = 0; end
     if length(win_ranges) < 2, win_ranges = [15:30]; end
 
-    win_ranges
+    % win_ranges
 
 
     %% --------------------

@@ -110,24 +110,24 @@ function ofdm_rx_itvl(filename, config)
     % if DEBUG2, fprintf('FFT\n'); end
     % analogDataFFT=fft(analogData);
 
-    % Np=numel(preamble);
-    % for i = 1:length(analogData)
-    %     if mod(i-1,length(analogData)/10) == 0
-    %         fprintf('%d\n', (i-1)/length(analogData)*100);
-    %     end
-    %     if i+Np-1 > length(analogData)
-    %         break;
-    %     end
-    %     corr(i) = abs(analogData(i:i+Np-1)*preamble');
-    % end
+    Np=numel(preamble);
+    for i = 1:length(analogData)
+        if mod(i-1,length(analogData)/10) == 0
+            fprintf('%d\n', (i-1)/length(analogData)*100);
+        end
+        if i+Np-1 > length(analogData)
+            break;
+        end
+        corr(i) = abs(analogData(i:i+Np-1)*preamble');
+    end
 
-    % fig_idx = fig_idx + 1;
-    % fh = figure(fig_idx); clf;
-    % subplot(2,1,1);
-    % plot(abs(analogData));
-    % subplot(2,1,2);
-    % plot(corr);
-    % return
+    fig_idx = fig_idx + 1;
+    fh = figure(fig_idx); clf;
+    subplot(2,1,1);
+    plot(abs(analogData));
+    subplot(2,1,2);
+    plot(corr, '-b.');
+    return
 
 
     % course timing synchornizing
@@ -156,6 +156,7 @@ function ofdm_rx_itvl(filename, config)
     fprintf('  dataInterval=%d\n', dataInterval);
     Ns=400;
     analogData_orig = analogData;
+    corr_orig = zeros(1, length(analogData_orig));
     [analogData, split_idx]=split(analogData,dataindex,dataSpan,dataInterval,Ns);
     Ns = size(analogData, 1);
     fprintf('  data after split = %dx%d\n', size(analogData));
@@ -204,6 +205,8 @@ function ofdm_rx_itvl(filename, config)
         set(gca, 'XLim', [1 size(analogData,2)]);
         waitforbuttonpress;
         print(fh, '-dpsc', [fig_dir filename '.' num2str(j) '.eps']);
+
+        corr_orig(split_idx(j):split_idx(j)+length(corr)-1) = corr;
         
         startIndex(j)=maxCorrIndex+sampleDelay;
         startIndexCorr(j)=0;
@@ -233,16 +236,25 @@ function ofdm_rx_itvl(filename, config)
         split_idx(j) = split_idx(j) + startIndexCorr(j) - sampleDelay;
     end
 
+    std_points = [split_idx(1):92457:length(analogData_orig)];
 
     fig_idx = fig_idx + 1;
     fh = figure(fig_idx); clf;
+    subplot(2,1,1);
     plot(abs(analogData_orig));
     hold on;
     plot(split_idx, abs(analogData_orig(split_idx)), 'ro');
+    plot(std_points, abs(analogData_orig(std_points)), 'g*')
+
+    subplot(2,1,2);
+    plot(corr_orig, '-b.');
+    hold on;
+    plot(split_idx, corr_orig(split_idx), 'ro');
+    plot(std_points, corr_orig(std_points), 'g*')
     print(fh, '-dpsc', [fig_dir filename '.eps']);
 
     split_idx(2:end) - split_idx(1:end-1)
-    
+
 end
 
 

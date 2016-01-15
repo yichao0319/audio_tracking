@@ -50,6 +50,8 @@
 %%   visualize_accel_walk('0904.exp1.square')
 %%   visualize_accel_walk('0906.exp1.mao.walk.square.hand')
 %%   visualize_accel_walk('0906.exp2.mao.walk.square.pocket')
+%%   visualize_accel_walk('1023.exp1.walk.square')
+%%   visualize_accel_walk('1023.exp2.walk.square')
 %%     
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
@@ -272,5 +274,34 @@ function visualize_accel_walk(filename)
     %     avg_dir = avg_dir / norm(avg_dir)
     % end
 
+
+
+    %% ----------------
+    %% Output:
+    %%   Print Directions and Vectors of a trace
+    %% ----------------
+    if 
+    %% 1023.exp7
+    % times = [4,10; 10,15; 18,30; 30,40; 45,55; 55,65; 72,82; 82,92];
+    %% 1023.exp8
+    times = [0,5; 5,10; 10,12; 16,25; 25,33; 36,40; 40,45; 45,50; 53,59; 59,65];
+    vectors = [1,0];
+    % dirs = zeros(size(times));
+    for si = 1:size(times,1)
+        idx = find(data(20,:)>=times(si,1) & data(20,:)<=times(si,2));
+        avg_dir(si) = mean(direction_dif(idx));
+
+        if si > 1
+            theta = avg_dir(si) - avg_dir(si-1);
+            vectors(si,:) = vectors(si-1,:) * [cos(theta), -sin(theta); sin(theta), cos(theta)];
+        end
+        % dirs(si,:) = mean(direction(1:2,idx),2)';
+    end
+    % avg_dir
+    % vectors
+    for si = 1:size(vectors,1)
+        fprintf('%.2f,%.2f;', vectors(si,:));
+    end
+    fprintf('\n');
 
 end
