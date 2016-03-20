@@ -1,0 +1,11 @@
+******************************
+** Codes
+******************************
+1. testPeakDetection.m
+    from Mao Wenguang
+2. retrieve_signals.m
+    preprocess audio signals collected in "beepbeep_fmcw" to extract correlation spikes and ground truth (the correct peaks) which can be applied in machine learning.
+3. preprocess_svm_input.m
+    preprocess spikes and ground truth (the correct peaks) from retrieve_signals.m to make them of the format for LibSVM.
+4. svm_cross_validation.py
+    take all preprocessed data from preprocess_svm_input.m and do 10-fold cross-validatation

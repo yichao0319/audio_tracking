@@ -8,7 +8,8 @@
 %%
 %%
 %% example:
-%%   gen_chirp(15000, 10)
+%%   gen_chirp(17000, 10)
+%%   gen_chirp(12000, 10)
 %%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
@@ -35,7 +36,7 @@ function gen_chirp(fc, time_len)
     %% --------------------
     %% Check input
     %% --------------------
-    if nargin < 1, fc = 17000; end
+    if nargin < 1, fc = 12000; end
     if nargin < 2, time_len = 60; end
 
 
@@ -65,7 +66,7 @@ function gen_chirp(fc, time_len)
     tm = 0.1;
     range_res = 0.01;
     % bw = range2bw(range_res, c);
-    bw = 3000;
+    bw = 2500;
     sweep_slope = bw/tm;
     fr_max = range2beat(range_max,sweep_slope,c);
 
@@ -86,27 +87,59 @@ function gen_chirp(fc, time_len)
     %% --------------------
     %% Generate Chirp -- Method 1
     %% --------------------
+    % hw = phased.FMCWWaveform('SweepBandwidth', bw,...
+    %    'SampleRate',fs,'SweepDirection','Up','SweepTime',tm, ...
+    %    'NumSweeps',1);
+    % x_base = step(hw);
+    % x = x_base .* exp(1i*2*pi*fc*(1:(tm*fs))/fs)';
+
+    % fig_idx = fig_idx + 1;
+    % fh = figure(fig_idx); clf;
+    % subplot(211); spectrogram(x_base,256,64,256,fs,'yaxis');
+    % set(gca, 'ylim', [0, 5])
+    % title('Base signal spectrogram');
+
+    % subplot(212); spectrogram(x,256,64,256,fs,'yaxis');
+    % title('FMCW signal spectrogram');
+    % return
+
+
+    %% --------------------
+    %% Generate Chirp -- Method 2
+    %% --------------------
     hw = phased.FMCWWaveform('SweepBandwidth', bw,...
        'SampleRate',fs,'SweepDirection','Up','SweepTime',tm, ...
        'NumSweeps',1);
     x_base = step(hw);
-    x = x_base .* exp(1i*2*pi*fc*(1:(tm*fs))/fs)';
+    x = x_base .* cos(2*pi*fc*[1:length(x_base)]/fs)';
+    x = lowPassFilterByFFT(x', fs, 20000, 0)';
+
+    fig_idx = fig_idx + 1;
+    fh = figure(fig_idx); clf;
+    subplot(211); spectrogram(x_base,256,64,256,fs,'yaxis');
+    set(gca, 'ylim', [0, 5])
+    title('Base signal spectrogram');
+
+    subplot(212); spectrogram(x,256,64,256,fs,'yaxis');
+    % set(gca, 'ylim', [10, 16])
+    title('FMCW signal spectrogram');
 
 
     %% --------------------
-    %% Generate Chirp -- Method 1
+    %% Generate Chirp -- Method 3
     %% --------------------
     % x = chirp(times,fc,tm,fc+bw);
 
-    fh = figure(1); clf;
-    subplot(211); plot(times,real(x));
-    xlabel('Time (s)'); ylabel('Amplitude (v)');
-    title('FMCW signal'); axis tight;
+    % fig_idx = fig_idx + 1;
+    % fh = figure(fig_idx); clf;
+    % subplot(211); plot(times,real(x));
+    % xlabel('Time (s)'); ylabel('Amplitude (v)');
+    % title('FMCW signal'); axis tight;
 
-    subplot(212); spectrogram(x,256,64,256,fs,'yaxis');
-    % set(gca, 'ylim', [0, 5000])
-    % set(gca, 'ylim', [0, 5000]+fc-1000)
-    title('FMCW signal spectrogram');
+    % subplot(212); spectrogram(x,256,64,256,fs,'yaxis');
+    % % set(gca, 'ylim', [0, 5000])
+    % % set(gca, 'ylim', [0, 5000]+fc-1000)
+    % title('FMCW signal spectrogram');
 
 
     num_chirp = floor(time_len / tm);
@@ -128,5 +161,14 @@ function gen_chirp(fc, time_len)
     signal_d = zeros(time_len*fs, 2);
     signal_d(:,2) = analogData;
     audiowrite([output_dir filename '.wav'], signal_d, fs, 'BitsPerSample', 16);
+
+
+    [tmp,~] = audioread([output_dir filename '.wav']);
+    tmp = tmp(:,2);
+    % size(tmp)
+    % tmp(1:5)'
+    % analogData(1:5)'
+    % real(analogData(1:5))'
+
 end
 
