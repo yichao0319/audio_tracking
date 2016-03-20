@@ -1,0 +1,55 @@
+*****************************
+** About:
+*****************************
+Here we transmit PN sequence and FMCW chirps together. The goal is to use the peaks (correlation from PN seq, and FFT from FMCW) to help each other to find the best peaks.
+
+
+*****************************
+** Codes:
+*****************************
+- ofdm_tx_longpn.m
+   Generate audio signals
+- process_rx_both.m
+   Process rx audio signals and combine spikes from PN seq and FMCW to estimate correct peaks.
+
+
+
+*****************************
+** Experiments:
+*****************************
+- rx8: config=1, static, within 30cm, blocked by hands in the middle
+- rx9: config=1, static, within 30cm, blocked by papers in the middle
+- rx10: config=1, static, within 30cm, blocked by a huge box in the middle
+- rx11: config=1, static, within 30cm, blocked by a human in the middle
+- rx12: config=1, static, within 30cm, blocked by a human in the middle
+- rx.2.2: config=2, static, within 30cm, covered by tower in the middle
+- rx.2.3: config=2, static, within 30cm, blocked by a huge box after 10s, people talk around
+- rx.2.4: config=2, static, within 30cm, blocked by a huge box after 10s
+- rx.2.5: config=2, static, within 30cm, blocked by a human after 10s
+- rx.2.6: config=2, static, within 30cm, covered by papers after 10s
+- rx.2.7: config=2, static, within 30cm, blocked by papers after 10s
+- rx.2.8: config=2, static, within 30cm, blocked by hands after 10s
+- rx.2.9: config=2, static, within 30cm, blocked by a huge box after 10s
+- rx.3.1: config=3, static, within 30cm, blocked by a huge box after 10s
+- rx.3.2: config=3, static, within 30cm, blocked by a huge box after 10s
+- rx.3.3: config=3, static, within 30cm, blocked by papers after 10s
+- rx.3.4: config=3, static, within 30cm, blocked by a door after 10s
+- rx.3.5: config=3, static, within 30cm, blocked by a door after 10s
+- rx.3.6: config=3, static, within 30cm, covered by a quilt after 10s
+- rx.3.7: config=3, static, within 30cm, covered by a quilt after 10s
+- rx.3.8: config=3, static, within 30cm, blocked by an iPad after 10s
+- rx.3.9: config=3, static, within 30cm, covered by an iPad after 10s
+- rx.3.10: config=3, static, within 30cm, covered by an jacket after 10s
+- rx.3.11: config=3, static, within 30cm, covered by an backpack after 10s
+- rx.3.12: config=3, static, within 30cm, covered by a pillo after 10s
+- rx.3.13: config=3, static, within 30cm, covered by a thin door after 10s
+- rx.3.14: config=3, static, within 30cm, covered by a thin door after 10s
+- rx.3.15: config=3, static, within 30cm, covered by a thin door after 10s
+- rx.3.16: config=3, static, within 30cm, covered by a wooden after 10s
+- rx.3.17: config=3, static, within 30cm, covered by a wooden after 10s
+- rx.3.18: config=3, within 30cm, close the drawer after 10s
+- rx.3.19: config=3, within 30cm, close the drawer after 10s
+- rx.3.20: config=3, static, within 30cm, all always within a drawer
+- rx.3.21: config=3, static, within 30cm, blocked by a man after 10s
+- rx.3.22: config=3, static, within 30cm, blocked by a man after 10s
+- rx.3.23: config=3, static, within 30cm, blocked by a man after 10s
