@@ -7,7 +7,7 @@ input_dir = "./processed/"
 output_dir = "./processed/"
 
 
-num_train_traces = 12
+num_train_traces = 3
 sample           = 5
 num_neighbors    = 5
 

@@ -60,8 +60,11 @@ print "  num non-peak samples: %d" % (num_nonpeaks)
 num_test_peaks  = int(math.ceil(num_peaks / fold))
 num_train_peaks = int(num_peaks - num_test_peaks)
 
-num_test_nonpeaks  = int(math.ceil(num_nonpeaks / fold))
-num_train_nonpeaks = int(num_nonpeaks - num_test_nonpeaks)
+# num_test_nonpeaks  = int(math.ceil(num_nonpeaks / fold))
+# num_train_nonpeaks = int(num_nonpeaks - num_test_nonpeaks)
+num_train_nonpeaks = 10 * num_train_peaks
+num_test_nonpeaks  = num_nonpeaks - num_train_nonpeaks
+
 
 for fi in xrange(0,fold):
 
@@ -74,12 +77,12 @@ for fi in xrange(0,fold):
   train_peak_list = [peak_list[i] for i in train_peak_idx]
   train_nonpeak_list = [nonpeak_list[i] for i in train_nonpeak_idx]
   train_list = train_peak_list + train_nonpeak_list
-  print len(train_list)
+  print "    fold%d: train len=%d" % (fi, len(train_list))
 
   test_peak_list = [peak_list[i] for i in test_peak_idx]
   test_nonpeak_list = [nonpeak_list[i] for i in test_nonpeak_idx]
   test_list = test_peak_list + test_nonpeak_list
-  print len(test_list)
+  print "    fold%d: test len=%d" % (fi, len(test_list))
 
 
   list_data.store_data("%srx.3.all.test%d.txt" % (output_dir, fi), test_list)
