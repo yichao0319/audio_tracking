@@ -14,9 +14,9 @@ output_dir = "./processed/"
 # print others
 # exit()
 
-fold          = 10  ## x-fold cross-validation
+fold          = 5  ## x-fold cross-validation
 sample        = 5
-num_neighbors = 5
+num_neighbors = 10
 
 peak_list = [];
 nonpeak_list = [];
@@ -89,6 +89,6 @@ for fi in xrange(0,fold):
   list_data.store_data("%srx.3.all.train%d.txt" % (output_dir, fi), train_list)
 
 
-  os.system("python svm_easy.py %srx.3.all.train%d.txt %srx.3.all.test%d.txt" % (output_dir, fi, output_dir, fi))
+  # os.system("python svm_easy.py %srx.3.all.train%d.txt %srx.3.all.test%d.txt" % (output_dir, fi, output_dir, fi))
 
 #

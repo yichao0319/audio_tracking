@@ -63,6 +63,7 @@ if len(sys.argv) > 6:
 else:
     w1 = 1
 
+
 train_pathname = sys.argv[1]
 assert os.path.exists(train_pathname),"training file not found"
 file_name = os.path.split(train_pathname)[1]

@@ -56,6 +56,7 @@ function visualize_pred(filename)
     status = load(sprintf('%s%s.status.txt', spike_dir, filename));
     peaks  = load(sprintf('%s%s.gt.txt', spike_dir, filename));
 
+    peaks = peaks(1:length(status));
     itvl = mean([peaks(2:end) - peaks(1)] ./ [1:(length(peaks)-1)]');
     row  = 1;
 
@@ -99,6 +100,20 @@ function visualize_pred(filename)
     %% Plot data
     %% --------------------
     if DEBUG2, fprintf('Plot data\n'); end
+
+    fig_idx = fig_idx + 1;
+    fh = figure(fig_idx); clf;
+
+    idx = 1:length(corr);
+    plot(idx/fs, corr, '-k');
+    hold on;
+    lh = plot(peaks/fs, corr(peaks), 'ro');
+    set(lh, 'MarkerSize', 10);
+    lh = plot(pred_idx/fs, pred_corr, 'bx');
+    set(lh, 'MarkerSize', 10);
+
+    waitforbuttonpress
+
 
     for si = 1:length(status)
         fh = figure(11); clf;

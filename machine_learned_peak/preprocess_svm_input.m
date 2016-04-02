@@ -30,7 +30,7 @@ function preprocess_svm_input()
     %% --------------------
     fig_idx = 0;
     sample = 5;
-    num_neighbors = 5;
+    num_neighbors = 10;
 
 
     %% --------------------
@@ -58,7 +58,7 @@ function preprocess_svm_input()
         itvl = mean([peaks(2:end) - peaks(1)] ./ [1:(length(peaks)-1)]');
         row  = 1;
 
-        for si = 1:length(status)
+        for si = 11:length(status)
             peak_idx = peaks(si);
             std_idx = peak_idx - 200;
             end_idx = peak_idx + 200;
@@ -66,6 +66,8 @@ function preprocess_svm_input()
 
             for ri = 1:length(range_idx)
                 idx = range_idx(ri);
+
+                %% Label of this sample
                 if idx == peak_idx
                     fprintf(fileID, '1 ');
                     % fprintf('  > peak\n');
@@ -73,6 +75,7 @@ function preprocess_svm_input()
                     fprintf(fileID, '0 ');
                 end
 
+                %% nearby samples from the same signal
                 std_idx2 = idx - 200;
                 end_idx2 = idx + 200;
                 range_idx2 = [std_idx2:sample:end_idx2];
@@ -90,6 +93,7 @@ function preprocess_svm_input()
                 % fprintf('  row=%d, col=%d\n', row, col);
 
 
+                %% samples from previous or next X signals
                 sel_neighbors = [-num_neighbors:-1 1:num_neighbors];
                 sel_neighbors = round(sel_neighbors*itvl + idx);
                 sel_neighbors = sel_neighbors(sel_neighbors>0);
@@ -98,6 +102,22 @@ function preprocess_svm_input()
                 features(row, col+[1:num_neighbors]) = corr(sel_neighbors);
                 col = col + num_neighbors;
                 % fprintf('     col=%d\n', col);
+
+
+                %% samples from previous or next X signals' nearby samples
+                sel_neighbor_nearby = [];
+                for ni = [-5:-1 1:5]
+                    sel_neighbor_nearby = [sel_neighbor_nearby sel_neighbors+ni];
+                end
+                sel_neighbor_nearby = sort(sel_neighbor_nearby);
+                invalid_range = find(sel_neighbor_nearby < 1);
+                valid_range   = find(sel_neighbor_nearby >= 1);
+
+                if length(invalid_range) > 0
+                    features(row, col+invalid_range) = 0;
+                end
+                features(row, col+valid_range) = corr(sel_neighbor_nearby(valid_range));
+                col = col + length(sel_neighbor_nearby);
 
 
                 for ci = 1:col
