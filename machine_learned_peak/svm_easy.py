@@ -34,26 +34,48 @@ assert os.path.exists(svmpredict_exe),"svm-predict executable not found"
 # assert os.path.exists(gnuplot_exe),"gnuplot executable not found"
 assert os.path.exists(grid_py),"grid.py not found"
 
+if len(sys.argv) > 3:
+	svm_type = sys.argv[3]
+else:
+	svm_type = 0
+
+if len(sys.argv) > 4:
+	kernel_type = sys.argv[4]
+else:
+	kernel_type = 2
+
+if len(sys.argv) > 5:
+	w0 = sys.argv[5]
+else:
+	w0 = 1
+
+if len(sys.argv) > 6:
+	w1 = sys.argv[6]
+else:
+	w1 = 1
+
 train_pathname = sys.argv[1]
 assert os.path.exists(train_pathname),"training file not found"
 file_name = os.path.split(train_pathname)[1]
-scaled_file = output_dir + file_name + ".scale"
-model_file = output_dir + file_name + ".model"
-range_file = output_dir + file_name + ".range"
+scaled_file = '{0}{1}.svm{2}.kernel{3}.w{4}{5}.scale'.format(output_dir, file_name, svm_type, kernel_type, w0, w1)
+model_file = '{0}{1}.svm{2}.kernel{3}.w{4}{5}.model'.format(output_dir, file_name, svm_type, kernel_type, w0, w1)
+range_file = '{0}{1}.svm{2}.kernel{3}.w{4}{5}.range'.format(output_dir, file_name, svm_type, kernel_type, w0, w1)
 
 if len(sys.argv) > 2:
 	test_pathname = sys.argv[2]
-	file_name = os.path.split(test_pathname)[1]
+	test_file_name = os.path.split(test_pathname)[1]
 	assert os.path.exists(test_pathname),"testing file not found"
-	scaled_test_file = output_dir + file_name + ".scale"
-	predict_test_file = output_dir + file_name + ".predict"
+	scaled_test_file = '{0}{1}.svm{2}.kernel{3}.w{4}{5}.scale'.format(output_dir, test_file_name, svm_type, kernel_type, w0, w1)
+	predict_test_file = '{0}{1}.svm{2}.kernel{3}.w{4}{5}.predict'.format(output_dir, test_file_name, svm_type, kernel_type, w0, w1)
+
+
 
 cmd = '{0} -s "{1}" "{2}" > "{3}"'.format(svmscale_exe, range_file, train_pathname, scaled_file)
 print('Scaling training data...')
 Popen(cmd, shell = True, stdout = PIPE).communicate()
 
 # cmd = '{0} -svmtrain "{1}" -gnuplot "{2}" "{3}"'.format(grid_py, svmtrain_exe, gnuplot_exe, scaled_file)
-cmd = '{0} -svmtrain "{1}" -gnuplot "null" -out "{2}{3}.out" "{4}"'.format(grid_py, svmtrain_exe, output_dir, file_name, scaled_file)
+cmd = '{0} -svmtrain "{1}" -gnuplot "null" -out "null" "{2}"'.format(grid_py, svmtrain_exe, scaled_file)
 print('Cross validation...')
 f = Popen(cmd, shell = True, stdout = PIPE).stdout
 
@@ -66,7 +88,7 @@ c,g,rate = map(float,last_line.split())
 
 print('Best c={0}, g={1} CV rate={2}'.format(c,g,rate))
 
-cmd = '{0} -c {1} -g {2} "{3}" "{4}"'.format(svmtrain_exe,c,g,scaled_file,model_file)
+cmd = '{0} -c {1} -g {2} -s {3} -k {4} -w0 {5} -w1 {6} "{7}" "{8}"'.format(svmtrain_exe, c, g, svm_type, kernel_type, w0, w1, scaled_file, model_file)
 print('Training...')
 Popen(cmd, shell = True, stdout = PIPE).communicate()
 

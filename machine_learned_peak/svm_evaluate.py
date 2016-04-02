@@ -9,7 +9,7 @@ pred_dir = "./svm_models/"
 filename = sys.argv[1]
 
 
-f = open(test_dir + filename + ".test.txt", 'r')
+f = open(test_dir + filename, 'r')
 test_label = []
 for line in f:
   line = line.strip()
@@ -19,7 +19,7 @@ for line in f:
   test_label.append(label)
 f.close()
 
-f = open(pred_dir + filename + ".test.txt.predict", 'r')
+f = open(pred_dir + filename + ".predict", 'r')
 pred_label = []
 for line in f:
   line = line.strip()
