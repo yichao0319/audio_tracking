@@ -14,7 +14,7 @@ output_dir = "./svm_models/"
 
 is_win32 = (sys.platform == 'win32')
 if not is_win32:
-    if 0:
+    if 1:
         svmscale_exe = "/Users/yichao/tools/libsvm-3.21/svm-scale"
         svmtrain_exe = "/Users/yichao/tools/libsvm-3.21/svm-train"
         svmpredict_exe = "/Users/yichao/tools/libsvm-3.21/svm-predict"
@@ -29,7 +29,7 @@ if not is_win32:
         gnuplot_exe = "/usr/bin/gnuplot"
 
 else:
-        # example for windows
+    # example for windows
     svmscale_exe = r"..\windows\svm-scale.exe"
     svmtrain_exe = r"..\windows\svm-train.exe"
     svmpredict_exe = r"..\windows\svm-predict.exe"
@@ -98,7 +98,7 @@ c,g,rate = map(float,last_line.split())
 
 print('Best c={0}, g={1} CV rate={2}'.format(c,g,rate))
 
-cmd = '{0} -c {1} -g {2} -s {3} -k {4} -w0 {5} -w1 {6} "{7}" "{8}"'.format(svmtrain_exe, c, g, svm_type, kernel_type, w0, w1, scaled_file, model_file)
+cmd = '{0} -c {1} -g {2} -s {3} -t {4} -w0 {5} -w1 {6} "{7}" "{8}"'.format(svmtrain_exe, c, g, svm_type, kernel_type, w0, w1, scaled_file, model_file)
 print('Training...')
 Popen(cmd, shell = True, stdout = PIPE).communicate()
 
